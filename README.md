@@ -1,9 +1,17 @@
 # TP docker-compose-2
+Your rendering must be done throug a private repository of yours where you will have to invite me.
+
 The purpose of this exercise is to create a connection between your application and two databases (mongodb and postgres).
+
+Your application is nodejs based, therefore your will need the following commands for running your application:
+  - yarn install
+  - yarn start
+
+If you don't have yarn you can use npm as well (``npm install`` and ``npm start``).
+
+
 # Step 1
 You have to contenerize your nodejs application by creating a Dockerfile.
-
-Your rendering must be done throug a private repository of yours where you will have to invite me.
 
 # Step 2
 You have to find a way to make your application interact with the two databses.
