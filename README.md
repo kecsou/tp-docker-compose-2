@@ -52,5 +52,5 @@ You have to set your monngodb's your postgres's data persistent using docker vol
 If you want information on the directory where these databases store their data, you can refer to the Docker Hub documentation provided above.
 
 ```
-Use the endpoint /calls/count for having an idea of your databases's volume state
+Use the endpoint /calls/count for having an idea of your databases's volumes's state
 ```
