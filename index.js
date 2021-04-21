@@ -4,18 +4,18 @@ const mongoose = require('mongoose');
 const { ApiCallModel } = require('./src/ApiCall');
 
 const port = Number(process.env.port || 80);
-const mongo_connection = process.env.mongo_connection;
+const MONGO_CONNECTION = process.env.MONGO_CONNECTION;
 const app = express();
 app.use(helmet());
 
-if (typeof mongo_connection !== 'string') {
-    console.error('A mongo connection must be provided');
+if (typeof MONGO_CONNECTION !== 'string') {
+    console.error('A MONGO_CONNECTION must be provided');
     process.exit(1);
 }
 
 async function bootstrap() {
     try {
-        await mongoose.connect(mongo_connection, {
+        await mongoose.connect(MONGO_CONNECTION, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
             useFindAndModify: false,
