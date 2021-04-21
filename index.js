@@ -44,7 +44,7 @@ async function bootstrap() {
         await sequelize.authenticate();
         console.log('Connection to postgres database done');
         ApiCallPostgresModel = ApiCallPostgres.getApiCallModel(sequelize)
-        await sequelize.sync({ force: true });
+        await sequelize.sync();
     } catch(e) {
         console.error('Error when connecting to postgres database');
         throw e;
@@ -79,10 +79,9 @@ async function bootstrap() {
 
     app.get('/calls/count', async (_, res) => {
         try {
-            const count = await ApiCallMongo.ApiCallModel.count();
             res.status(200).json({
-                mongo: count,
-                postgres: 0,
+                mongo: await ApiCallMongo.ApiCallModel.countDocuments(),
+                postgres: await ApiCallPostgresModel.count(),
             });
         } catch(e) {
             console.error(e);
