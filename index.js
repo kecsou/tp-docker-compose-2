@@ -4,11 +4,11 @@ const mongoose = require('mongoose');
 const { Sequelize } = require('sequelize');
 
 const ApiCallMongo = require('./src/ApiCallMongo');
-const ApiCallPostgress = require('./src/ApiCallPostgress');
+const ApiCallPostgres = require('./src/ApiCallPostgres');
 
 const port = Number(process.env.port || 80);
 const MONGO_CONNECTION = process.env.MONGO_CONNECTION;
-const POSTGRESS_CONNECTION = process.env.POSTGRESS_CONNECTION;
+const POSTGRES_CONNECTION = process.env.POSTGRES_CONNECTION;
 
 const app = express();
 app.use(helmet());
@@ -18,14 +18,14 @@ if (typeof MONGO_CONNECTION !== 'string') {
     process.exit(1);
 }
 
-if (typeof POSTGRESS_CONNECTION !== 'string') {
-    console.error('A POSTGRESS_CONNECTION must be provided');
+if (typeof POSTGRES_CONNECTION !== 'string') {
+    console.error('A POSTGRES_CONNECTION must be provided');
     process.exit(1);
 }
 
 async function bootstrap() {
     let sequelize;
-    let ApiCallPostgressModel;
+    let ApiCallPostgresModel;
     try {
         await mongoose.connect(MONGO_CONNECTION, {
             useNewUrlParser: true,
@@ -40,10 +40,10 @@ async function bootstrap() {
     }
 
     try {
-        sequelize = new Sequelize(POSTGRESS_CONNECTION);
+        sequelize = new Sequelize(POSTGRES_CONNECTION);
         await sequelize.authenticate();
-        console.log('Connection to postgress database done');
-        ApiCallPostgressModel = ApiCallPostgress.getApiCallModel(sequelize)
+        console.log('Connection to postgres database done');
+        ApiCallPostgresModel = ApiCallPostgres.getApiCallModel(sequelize)
         await sequelize.sync({ force: true });
     } catch(e) {
         console.error('Error when connecting to postgres database');
@@ -56,8 +56,8 @@ async function bootstrap() {
         console.log(`Call on path: ${path} with method: ${method}`);
         try {
             const apiCallMongo = new ApiCallMongo.ApiCallModel();
-            const apiCallPostgress = ApiCallPostgressModel.build({ path, method, date });
-            await apiCallPostgress.save();
+            const apiCallPostgres = ApiCallPostgresModel.build({ path, method, date });
+            await apiCallPostgres.save();
 
             apiCallMongo.path = path;
             apiCallMongo.method = method;
@@ -82,7 +82,7 @@ async function bootstrap() {
             const count = await ApiCallMongo.ApiCallModel.count();
             res.status(200).json({
                 mongo: count,
-                postgress: 0,
+                postgres: 0,
             });
         } catch(e) {
             console.error(e);
