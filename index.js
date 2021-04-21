@@ -4,10 +4,11 @@ const mongoose = require('mongoose');
 const { Sequelize } = require('sequelize');
 
 const ApiCallMongo = require('./src/ApiCallMongo');
+const ApiCallPostgress = require('./src/ApiCallPostgress');
 
 const port = Number(process.env.port || 80);
 const MONGO_CONNECTION = process.env.MONGO_CONNECTION;
-const POSTGRES_URI = process.env.POSTGRES_URI;
+const POSTGRESS_CONNECTION = process.env.POSTGRESS_CONNECTION;
 
 const app = express();
 app.use(helmet());
@@ -17,13 +18,14 @@ if (typeof MONGO_CONNECTION !== 'string') {
     process.exit(1);
 }
 
-if (typeof POSTGRES_URI !== 'string') {
-    console.error('A POSTGRES_URI must be provided');
+if (typeof POSTGRESS_CONNECTION !== 'string') {
+    console.error('A POSTGRESS_CONNECTION must be provided');
     process.exit(1);
 }
 
 async function bootstrap() {
     let sequelize;
+    let ApiCallPostgressModel;
     try {
         await mongoose.connect(MONGO_CONNECTION, {
             useNewUrlParser: true,
@@ -38,25 +40,37 @@ async function bootstrap() {
     }
 
     try {
-        sequelize = new Sequelize(POSTGRES_URI);
+        sequelize = new Sequelize(POSTGRESS_CONNECTION);
         await sequelize.authenticate();
         console.log('Connection to postgress database done');
+        ApiCallPostgressModel = ApiCallPostgress.getApiCallModel(sequelize)
+        await sequelize.sync({ force: true });
     } catch(e) {
         console.error('Error when connecting to postgres database');
         throw e;
     }
 
-    app.use((req, _, next) => {
-        const apiCall = new ApiCallModel();
-        apiCall.path = req.path;
-        apiCall.method = req.method;
-        console.log(`Call on path: ${req.path} with method: ${req.method}`);
-        apiCall.save((err) => {
-            if (err) {
-                console.error(err);
-            }
-            next();
-        });
+    app.use(async (req, _, next) => {
+        const { path, method } = req;
+        const date = Date.now();
+        console.log(`Call on path: ${path} with method: ${method}`);
+        try {
+            const apiCallMongo = new ApiCallMongo.ApiCallModel();
+            const apiCallPostgress = ApiCallPostgressModel.build({ path, method, date });
+            await apiCallPostgress.save();
+
+            apiCallMongo.path = path;
+            apiCallMongo.method = method;
+            apiCallMongo.save((err) => {
+                if (err) {
+                    console.error(err);
+                }
+                next();
+            });
+        } catch(e) {
+            console.error(e);
+            throw e;
+        }
     });
 
     app.get('/', (_, res) => {
