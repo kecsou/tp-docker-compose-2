@@ -5,6 +5,9 @@
   "repository": "git@github.com:kecsou/tp-docker-compose-2.git",
   "author": "kecsou <kevin.voyer.developpeur@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "start": "node index.js"
+  },
   "dependencies": {
     "express": "^4.17.1",
     "helmet": "^4.5.0",
