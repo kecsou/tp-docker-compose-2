@@ -1,0 +1,13 @@
+{
+  "name": "tp-docker-compose-2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:kecsou/tp-docker-compose-2.git",
+  "author": "kecsou <kevin.voyer.developpeur@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "helmet": "^4.5.0",
+    "mongoose": "^5.12.5"
+  }
+}
