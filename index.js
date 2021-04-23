@@ -9,9 +9,16 @@ const ApiCallPostgres = require('./src/ApiCallPostgres');
 const port = Number(process.env.port || 80);
 const MONGO_CONNECTION = process.env.MONGO_CONNECTION;
 const POSTGRES_CONNECTION = process.env.POSTGRES_CONNECTION;
+const TIMEOUT_BEFORE_POSTGRES_CONNECTION = Number(process.env.TIMEOUT_BEFORE_POSTGRES_CONNECTION || 2000);
 
 const app = express();
 app.use(helmet());
+
+function sleep(ms = 1000) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
+}
 
 if (typeof MONGO_CONNECTION !== 'string') {
     console.error('A MONGO_CONNECTION must be provided');
@@ -41,6 +48,7 @@ async function bootstrap() {
 
     try {
         sequelize = new Sequelize(POSTGRES_CONNECTION);
+        await sleep(TIMEOUT_BEFORE_POSTGRES_CONNECTION);
         await sequelize.authenticate();
         console.log('Connection to postgres database done');
         ApiCallPostgresModel = ApiCallPostgres.getApiCallModel(sequelize)
