@@ -17,6 +17,8 @@ services:
     image: mongo
     networks: 
       - backend-network
+    volumes: 
+      - db-mongo:/data/db
   postgres:
     image: postgres
     environment: 
@@ -24,6 +26,11 @@ services:
       - POSTGRES_PASSWORD=admin
     networks: 
       - backend-network
+    volumes: 
+      - db-postgres:/var/lib/postgresql/data
 networks: 
   backend-network:
     driver: bridge
+volumes: 
+  db-mongo:
+  db-postgres:
