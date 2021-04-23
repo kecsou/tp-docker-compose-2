@@ -1,0 +1,29 @@
+version: '3'
+services:
+  app:
+    depends_on:
+      - mongo
+      - postgres
+    build: .
+    environment: 
+      - MONGO_CONNECTION=mongodb://mongo:27017
+      - POSTGRES_CONNECTION=postgres://kecsou:admin@postgres:5432/postgres
+      - TIMEOUT_BEFORE_POSTGRES_CONNECTION=2000
+    ports:
+      - 6543:80
+    networks: 
+      - backend-network
+  mongo:
+    image: mongo
+    networks: 
+      - backend-network
+  postgres:
+    image: postgres
+    environment: 
+      - POSTGRES_USER=kecsou
+      - POSTGRES_PASSWORD=admin
+    networks: 
+      - backend-network
+networks: 
+  backend-network:
+    driver: bridge
